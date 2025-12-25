@@ -108,21 +108,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     int streak = 0;
     DateTime currentDate = DateTime.now();
 
-    // Check today first
-    String todayKey = _getTodayKeyValue();
+    String todayKey = _getTodayKey();
     Map<dynamic, dynamic>? todayData = _myBox.get(todayKey);
+
+    print('🔥 Calculating streak for $todayKey');
 
     if (todayData != null) {
       int completedCount = todayData['completedCount'] ?? 0;
       int totalTasks = todayData['totalTasks'] ?? 0;
 
-      // Today must be complete (all tasks done)
-      if (totalTasks == 3 && completedCount == totalTasks) {
+      print('   Today: $completedCount/$totalTasks');
+
+      // ONLY calculate streak if today is fully complete (3/3)
+      if (totalTasks == 3 && completedCount == 3) {
         streak = 1;
+        print('   ✅ Today complete (3/3)! Streak starts at 1');
 
         // Check previous days
         for (int i = 1; i < 365; i++) {
-          // Check up to a year back
           DateTime previousDate = currentDate.subtract(Duration(days: i));
           String previousKey = _getDateKey(previousDate);
 
@@ -132,19 +135,105 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             int prevCompleted = previousData['completedCount'] ?? 0;
             int prevTotal = previousData['totalTasks'] ?? 0;
 
-            if (prevTotal > 0 && prevCompleted == prevTotal) {
+            if (prevTotal == 3 && prevCompleted == 3) {
               streak++;
+              print('   $previousKey complete! Streak: $streak');
             } else {
-              // Streak broken
+              print('   $previousKey incomplete. Streak broken.');
               break;
             }
           } else {
-            // No data for this day, streak broken
+            print('   $previousKey no data. Streak broken.');
             break;
+          }
+        }
+      } else if (totalTasks == 0) {
+        // New day with no tasks yet - check if yesterday was complete to maintain streak
+        print('   📅 New day (no tasks yet). Checking yesterday...');
+
+        DateTime yesterday = currentDate.subtract(Duration(days: 1));
+        String yesterdayKey = _getDateKey(yesterday);
+        Map<dynamic, dynamic>? yesterdayData = _myBox.get(yesterdayKey);
+
+        if (yesterdayData != null) {
+          int yesterdayCompleted = yesterdayData['completedCount'] ?? 0;
+          int yesterdayTotal = yesterdayData['totalTasks'] ?? 0;
+
+          if (yesterdayTotal == 3 && yesterdayCompleted == 3) {
+            print('   ✅ Yesterday was complete! Maintaining streak...');
+
+            // Count from yesterday backwards
+            streak = 1;
+            for (int i = 2; i < 365; i++) {
+              DateTime previousDate = currentDate.subtract(Duration(days: i));
+              String previousKey = _getDateKey(previousDate);
+
+              Map<dynamic, dynamic>? previousData = _myBox.get(previousKey);
+
+              if (previousData != null) {
+                int prevCompleted = previousData['completedCount'] ?? 0;
+                int prevTotal = previousData['totalTasks'] ?? 0;
+
+                if (prevTotal == 3 && prevCompleted == 3) {
+                  streak++;
+                } else {
+                  break;
+                }
+              } else {
+                break;
+              }
+            }
+          } else {
+            print('   ❌ Yesterday incomplete. Streak: 0');
+          }
+        }
+      } else {
+        // Today has tasks but not all complete yet
+        print(
+          '   ⏳ Today in progress ($completedCount/$totalTasks). Not updating streak.',
+        );
+        // Keep the previous streak value (load from Hive)
+        streak = _myBox.get('currentStreak', defaultValue: 0);
+      }
+    } else {
+      // No data for today - check yesterday
+      print('   📅 No data for today. Checking yesterday...');
+
+      DateTime yesterday = currentDate.subtract(Duration(days: 1));
+      String yesterdayKey = _getDateKey(yesterday);
+      Map<dynamic, dynamic>? yesterdayData = _myBox.get(yesterdayKey);
+
+      if (yesterdayData != null) {
+        int yesterdayCompleted = yesterdayData['completedCount'] ?? 0;
+        int yesterdayTotal = yesterdayData['totalTasks'] ?? 0;
+
+        if (yesterdayTotal == 3 && yesterdayCompleted == 3) {
+          // Count from yesterday backwards
+          streak = 1;
+          for (int i = 2; i < 365; i++) {
+            DateTime previousDate = currentDate.subtract(Duration(days: i));
+            String previousKey = _getDateKey(previousDate);
+
+            Map<dynamic, dynamic>? previousData = _myBox.get(previousKey);
+
+            if (previousData != null) {
+              int prevCompleted = previousData['completedCount'] ?? 0;
+              int prevTotal = previousData['totalTasks'] ?? 0;
+
+              if (prevTotal == 3 && prevCompleted == 3) {
+                streak++;
+              } else {
+                break;
+              }
+            } else {
+              break;
+            }
           }
         }
       }
     }
+
+    print('✅ Final streak: $streak');
 
     setState(() {
       currentStreak = streak;
@@ -292,35 +381,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final tomorrow = DateTime(now.year, now.month, now.day + 1);
     final durationUntilMidnight = tomorrow.difference(now);
 
+    print(
+      '⏰ Scheduling midnight check in ${durationUntilMidnight.inHours} hours',
+    );
+
     Future.delayed(durationUntilMidnight, () {
       if (mounted) {
-        // Check if yesterday was completed
-        DateTime yesterday = now.subtract(Duration(days: 1));
-        String yesterdayKey = _getDateKey(yesterday);
-        Map<dynamic, dynamic>? yesterdayData = _myBox.get(yesterdayKey);
+        print('🌙 Midnight reached! New day started.');
 
-        bool yesterdayComplete = false;
-        if (yesterdayData != null) {
-          int completed = yesterdayData['completedCount'] ?? 0;
-          int total = yesterdayData['totalTasks'] ?? 0;
-          yesterdayComplete = (total > 0 && completed == total);
-        }
+        // Reset confetti flag for new day
+        _hasShownConfetti = false;
 
-        // If yesterday wasn't complete, reset streak
-        if (!yesterdayComplete) {
-          setState(() {
-            currentStreak = 0;
-          });
-          _myBox.put('currentStreak', 0);
-        }
+        // Load new day's tasks (this will be empty for the new day)
+        _loadTasksForToday();
 
-        // Load new day's tasks
-        setState(() {
-          _loadTasksForToday();
-        });
+        // Recalculate streak based on previous days
+        // This will check if yesterday was complete and count the streak properly
+        _calculateStreak();
 
-        // _scheduleMidnightCheck();
-        _calculateStreak(); // Schedule next check
+        // Schedule next midnight check
+        _scheduleMidnightCheck();
       }
     });
   }
@@ -383,17 +463,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _saveTasksToHive();
-      _calculateStreak();
 
-      // Check if all tasks just became complete
-      if (!wasAllComplete && allTasksComplete && !_hasShownConfetti) {
+      // ONLY recalculate streak when ALL tasks become complete
+      bool isNowAllComplete = allTasksComplete;
+      if (!wasAllComplete && isNowAllComplete) {
+        print('✅ All tasks completed! Recalculating streak...');
+        _calculateStreak();
         _celebrateCompletion();
       }
 
-      // Reset confetti flag if unchecking
-      if (!allTasksComplete) {
+      // If unchecking a task, don't recalculate (streak stays as is until midnight)
+      if (!isNowAllComplete) {
         _hasShownConfetti = false;
-      } // Recalculate streak after saving
+      }
     });
   }
 
@@ -586,34 +668,36 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 Text(
                   'Just 3',
                   style: kLargeHeading.copyWith(
-                    fontSize: MediaQuery.of(context).size.width < 600 ? MediaQuery.of(context).size.width * .06 : MediaQuery.of(context).size.width * .06,
+                    fontSize: MediaQuery.of(context).size.width < 600
+                        ? MediaQuery.of(context).size.width * .06
+                        : MediaQuery.of(context).size.width * .06,
                   ),
                 ),
                 SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      '3 Tasks Per Day, ',
-                      style: kHeading.copyWith(
-                        fontSize: MediaQuery.of(context).size.width < 600
-                            ? 16
-                            : 20,
-                        // fontSize: MediaQuery.of(context).size.width * .028,
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '3 Tasks Per Day, ',
+                        style: kHeading.copyWith(
+                          fontSize: MediaQuery.of(context).size.width < 600
+                              ? 16
+                              : 20,
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                        ),
                       ),
-                    ),
-                    Text(
-                      'NO MORE',
-                      style: kSemiLargeHeading.copyWith(
-                        fontSize: MediaQuery.of(context).size.width < 600
-                            ? 23
-                            : 28,
-                        // fontSize: MediaQuery.of(context).size.width * .036,
-                        color: AppColors.pastelGreenColor,
+                      TextSpan(
+                        text: 'NO MORE',
+                        style: kSemiLargeHeading.copyWith(
+                          fontSize: MediaQuery.of(context).size.width < 600
+                              ? 23
+                              : 28,
+                          color: AppColors.pastelGreenColor,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 SizedBox(height: 40),
 
