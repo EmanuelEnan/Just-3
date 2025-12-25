@@ -577,8 +577,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       body: SafeArea(
         child: Center(
           child: Container(
-            width: MediaQuery.sizeOf(context).width * .6,
-            padding: const EdgeInsets.all(24.0),
+            // width: MediaQuery.sizeOf(context).width * .6,
+            padding: const EdgeInsets.symmetric(horizontal: 35.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -586,12 +586,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 Text(
                   'Just 3',
                   style: kLargeHeading.copyWith(
-                    fontSize: MediaQuery.of(context).size.width * .05,
+                    fontSize: MediaQuery.of(context).size.width < 600 ? MediaQuery.of(context).size.width * .06 : MediaQuery.of(context).size.width * .06,
                   ),
                 ),
                 SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       '3 Tasks Per Day, ',
