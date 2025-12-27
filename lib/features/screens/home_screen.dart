@@ -7,6 +7,8 @@ import 'package:just_3/core/constants/app_colors.dart';
 import 'package:just_3/core/constants/app_text_style.dart';
 import 'package:just_3/features/screens/history_screen.dart';
 import 'package:just_3/features/screens/settings_screen.dart';
+import 'package:just_3/features/widgets/fire_strike_animation.dart';
+import 'package:just_3/features/widgets/hover_container.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(ThemeMode) onThemeChanged;
@@ -659,7 +661,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       body: SafeArea(
         child: Center(
           child: Container(
-            // width: MediaQuery.sizeOf(context).width * .6,
+            width: MediaQuery.of(context).size.width > 600
+                ? MediaQuery.sizeOf(context).width * .6
+                : null,
+            margin: EdgeInsets.symmetric(vertical: 20),
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: MediaQuery.of(context).size.width > 600
+                    ? AppColors.pastelGreenColor
+                    : Colors.transparent,
+              ),
+            ),
             padding: const EdgeInsets.symmetric(horizontal: 35.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -669,11 +683,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   'Just 3',
                   style: kLargeHeading.copyWith(
                     fontSize: MediaQuery.of(context).size.width < 600
-                        ? MediaQuery.of(context).size.width * .06
-                        : MediaQuery.of(context).size.width * .06,
+                        ? MediaQuery.of(context).size.width * .05
+                        : MediaQuery.of(context).size.width * .05,
                   ),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 8),
                 RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
@@ -683,7 +697,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         style: kHeading.copyWith(
                           fontSize: MediaQuery.of(context).size.width < 600
                               ? 16
-                              : 20,
+                              : 23,
                           color: Theme.of(context).textTheme.bodyLarge?.color,
                         ),
                       ),
@@ -691,8 +705,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         text: 'NO MORE',
                         style: kSemiLargeHeading.copyWith(
                           fontSize: MediaQuery.of(context).size.width < 600
-                              ? 23
-                              : 28,
+                              ? 24
+                              : 30,
                           color: AppColors.pastelGreenColor,
                         ),
                       ),
@@ -774,10 +788,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             child: Align(
                                               alignment: Alignment.centerLeft,
                                               child: CustomPaint(
-                                                painter: StrikeThroughPainter(
-                                                  progress:
-                                                      strikeAnimations[i].value,
-                                                ),
+                                                painter:
+                                                    LightningStrikeThroughPainter(
+                                                      // or LightningStrikeThroughPainter, etc.
+                                                      progress:
+                                                          strikeAnimations[i]
+                                                              .value,
+                                                    ),
                                                 child: Container(height: 1),
                                               ),
                                             ),
@@ -797,33 +814,42 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     padding: const EdgeInsets.only(top: 12.0),
                     child: Column(
                       children: [
-                        Container(
-                          padding: EdgeInsets.all(15),
+                        HoverContainer(
                           width: taskCardWidth,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.blueGrey,
-                          ),
+                          color: Colors.blueGrey,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.warmOrangeColor,
+                              blurRadius: 4,
+                              offset: Offset(2, 2),
+                            ),
+                          ],
                           child: Text('Task #1', style: kRegular),
                         ),
-                        SizedBox(height: 7),
-                        Container(
-                          padding: EdgeInsets.all(15),
+                        SizedBox(height: 14),
+                        HoverContainer(
                           width: taskCardWidth,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.blueGrey,
-                          ),
+                          color: Colors.blueGrey,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.warmOrangeColor,
+                              blurRadius: 4,
+                              offset: Offset(2, 2),
+                            ),
+                          ],
                           child: Text('Task #2', style: kRegular),
                         ),
-                        SizedBox(height: 7),
-                        Container(
-                          padding: EdgeInsets.all(15),
+                        SizedBox(height: 14),
+                        HoverContainer(
                           width: taskCardWidth,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.blueGrey,
-                          ),
+                          color: Colors.blueGrey,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.warmOrangeColor,
+                              blurRadius: 4,
+                              offset: Offset(2, 2),
+                            ),
+                          ],
                           child: Text('Task #3', style: kRegular),
                         ),
                       ],
@@ -835,23 +861,29 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     padding: const EdgeInsets.all(12.0),
                     child: Column(
                       children: [
-                        Container(
-                          padding: EdgeInsets.all(15),
+                        HoverContainer(
                           width: taskCardWidth,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.blueGrey,
-                          ),
+                          color: Colors.blueGrey,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.warmOrangeColor,
+                              blurRadius: 4,
+                              offset: Offset(2, 2),
+                            ),
+                          ],
                           child: Text('Task #2', style: kRegular),
                         ),
-                        SizedBox(height: 12),
-                        Container(
-                          padding: EdgeInsets.all(15),
+                        SizedBox(height: 14),
+                        HoverContainer(
                           width: taskCardWidth,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.blueGrey,
-                          ),
+                          color: Colors.blueGrey,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.warmOrangeColor,
+                              blurRadius: 4,
+                              offset: Offset(2, 2),
+                            ),
+                          ],
                           child: Text('Task #3', style: kRegular),
                         ),
                       ],
@@ -863,13 +895,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     padding: const EdgeInsets.all(12.0),
                     child: Column(
                       children: [
-                        Container(
-                          padding: EdgeInsets.all(15),
+                        HoverContainer(
                           width: taskCardWidth,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.blueGrey,
-                          ),
+                          color: Colors.blueGrey,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.warmOrangeColor,
+                              blurRadius: 4,
+                              offset: Offset(2, 2),
+                            ),
+                          ],
                           child: Text('Task #3', style: kRegular),
                         ),
                       ],
@@ -884,6 +919,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     decoration: BoxDecoration(
                       color: AppColors.pastelGreenColor,
                       borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.warmOrangeColor,
+                          blurRadius: 4,
+                          offset: Offset(2, 2),
+                        ),
+                      ],
                     ),
                     child: Text(
                       '✓ Completed',
@@ -982,26 +1024,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 }
 
 // Custom painter for animated strike-through line
-class StrikeThroughPainter extends CustomPainter {
-  final double progress;
+// class StrikeThroughPainter extends CustomPainter {
+//   final double progress;
 
-  StrikeThroughPainter({required this.progress});
+//   StrikeThroughPainter({required this.progress});
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.black
-      ..strokeWidth = 1.5
-      ..style = PaintingStyle.stroke;
+//   @override
+//   void paint(Canvas canvas, Size size) {
+//     final paint = Paint()
+//       ..color = Colors.black
+//       ..strokeWidth = 1.5
+//       ..style = PaintingStyle.stroke;
 
-    final startPoint = Offset(0, size.height / 2);
-    final endPoint = Offset(size.width * progress, size.height / 2);
+//     final startPoint = Offset(0, size.height / 2);
+//     final endPoint = Offset(size.width * progress, size.height / 2);
 
-    canvas.drawLine(startPoint, endPoint, paint);
-  }
+//     canvas.drawLine(startPoint, endPoint, paint);
+//   }
 
-  @override
-  bool shouldRepaint(StrikeThroughPainter oldDelegate) {
-    return oldDelegate.progress != progress;
-  }
-}
+//   @override
+//   bool shouldRepaint(StrikeThroughPainter oldDelegate) {
+//     return oldDelegate.progress != progress;
+//   }
+// }

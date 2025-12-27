@@ -126,90 +126,92 @@ class HistoryScreenState extends State<HistoryScreen> {
                       final isFullyCompleted =
                           completedCount == totalTasks && totalTasks == 3;
 
-                      return Card(
-                        margin: EdgeInsets.only(bottom: 10),
-                        elevation: 2,
-                        child: ExpansionTile(
-                          leading: CircleAvatar(
-                            backgroundColor: isFullyCompleted
-                                ? Colors.green
-                                : Colors.orange,
-                            child: Icon(
-                              isFullyCompleted ? Icons.check : Icons.pending,
-                              color: Colors.white,
-                            ),
-                          ),
-                          title: Text(
-                            _formatDate(dayData['date']),
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          subtitle: Text(
-                            '$completedCount/$totalTasks tasks completed',
-                            style: TextStyle(
-                              color: isFullyCompleted
+                      return Expanded(
+                        child: Card(
+                          margin: EdgeInsets.only(bottom: 10),
+                          elevation: 2,
+                          child: ExpansionTile(
+                            leading: CircleAvatar(
+                              backgroundColor: isFullyCompleted
                                   ? Colors.green
-                                  : Colors.grey[600],
-                            ),
-                          ),
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.all(15),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  for (
-                                    int i = 0;
-                                    i < (dayData['tasks'] as List).length;
-                                    i++
-                                  )
-                                    if (dayData['tasks'][i] != null)
-                                      Padding(
-                                        padding: EdgeInsets.only(bottom: 8),
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              (dayData['checkboxStates'][i]
-                                                      as bool)
-                                                  ? Icons.check_box
-                                                  : Icons
-                                                        .check_box_outline_blank,
-                                              color:
-                                                  (dayData['checkboxStates'][i]
-                                                      as bool)
-                                                  ? Colors.green
-                                                  : Colors.grey,
-                                            ),
-                                            SizedBox(width: 10),
-                                            Expanded(
-                                              child: Text(
-                                                dayData['tasks'][i].toString(),
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  decoration:
-                                                      (dayData['checkboxStates'][i]
-                                                          as bool)
-                                                      ? TextDecoration
-                                                            .lineThrough
-                                                      : TextDecoration.none,
-                                                  color:
-                                                      (dayData['checkboxStates'][i]
-                                                          as bool)
-                                                      ? Colors.grey
-                                                      : AppColors
-                                                            .pastelGreenColor,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                ],
+                                  : Colors.orange,
+                              child: Icon(
+                                isFullyCompleted ? Icons.check : Icons.pending,
+                                color: Colors.white,
                               ),
                             ),
-                          ],
+                            title: Text(
+                              _formatDate(dayData['date']),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            subtitle: Text(
+                              '$completedCount/$totalTasks tasks completed',
+                              style: TextStyle(
+                                color: isFullyCompleted
+                                    ? Colors.green
+                                    : Colors.grey[600],
+                              ),
+                            ),
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.all(15),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    for (
+                                      int i = 0;
+                                      i < (dayData['tasks'] as List).length;
+                                      i++
+                                    )
+                                      if (dayData['tasks'][i] != null)
+                                        Padding(
+                                          padding: EdgeInsets.only(bottom: 8),
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                (dayData['checkboxStates'][i]
+                                                        as bool)
+                                                    ? Icons.check_box
+                                                    : Icons
+                                                          .check_box_outline_blank,
+                                                color:
+                                                    (dayData['checkboxStates'][i]
+                                                        as bool)
+                                                    ? Colors.green
+                                                    : Colors.grey,
+                                              ),
+                                              SizedBox(width: 10),
+                                              Expanded(
+                                                child: Text(
+                                                  dayData['tasks'][i].toString(),
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    decoration:
+                                                        (dayData['checkboxStates'][i]
+                                                            as bool)
+                                                        ? TextDecoration
+                                                              .lineThrough
+                                                        : TextDecoration.none,
+                                                    color:
+                                                        (dayData['checkboxStates'][i]
+                                                            as bool)
+                                                        ? Colors.grey
+                                                        : AppColors
+                                                              .pastelGreenColor,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },

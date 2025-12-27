@@ -48,47 +48,70 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: Container(
-            width: MediaQuery.of(context).size.width * .6,
-            padding: EdgeInsets.all(24),
-            child: ListView(
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    'Appearance',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.pastelGreenColor,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // Determine container width based on screen size
+            double containerWidth;
+            if (constraints.maxWidth > 1200) {
+              // Desktop/Large screens
+              containerWidth = constraints.maxWidth * 0.4;
+            } else if (constraints.maxWidth > 800) {
+              // Tablet/Medium screens
+              containerWidth = constraints.maxWidth * 0.6;
+            } else if (constraints.maxWidth > 600) {
+              // Small tablet
+              containerWidth = constraints.maxWidth * 0.8;
+            } else {
+              // Mobile
+              containerWidth = constraints.maxWidth * 0.95;
+            }
+
+            return Center(
+              child: Container(
+                width: containerWidth,
+                constraints: BoxConstraints(
+                  maxWidth: 800, // Maximum width limit
+                  minWidth: 300, // Minimum width
+                ),
+                padding: EdgeInsets.symmetric(
+                  horizontal: constraints.maxWidth > 600 ? 24 : 16,
+                  vertical: 24,
+                ),
+                child: ListView(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text(
+                        'Appearance',
+                        style: TextStyle(
+                          fontSize: constraints.maxWidth > 600 ? 20 : 18,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.pastelGreenColor,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
 
-                ListTile(
-                  leading: Icon(Icons.brightness_6),
-                  title: Text('Theme'),
-                  subtitle: Text(_getThemeDisplayName(_selectedTheme)),
-                  trailing: Icon(Icons.chevron_right),
-                  onTap: () {
-                    _showThemeDialog();
-                  },
-                ),
+                    ListTile(
+                      leading: Icon(Icons.brightness_6),
+                      title: Text('Theme'),
+                      subtitle: Text(_getThemeDisplayName(_selectedTheme)),
+                      trailing: Icon(Icons.chevron_right),
+                      onTap: _showThemeDialog,
+                    ),
 
-                Divider(),
+                    Divider(),
 
-                ListTile(
-                  leading: Icon(Icons.info_outline),
-                  title: Text('About'),
-                  trailing: Icon(Icons.chevron_right),
-                  onTap: () {
-                    _showAboutDialog();
-                  },
+                    ListTile(
+                      leading: Icon(Icons.info_outline),
+                      title: Text('About'),
+                      trailing: Icon(Icons.chevron_right),
+                      onTap: _showAboutDialog,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
