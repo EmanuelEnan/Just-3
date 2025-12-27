@@ -105,60 +105,128 @@ class HistoryScreenState extends State<HistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: Container(
-            width: MediaQuery.of(context).size.width * .6,
-            padding: const EdgeInsets.all(24.0),
-            child: historyData.isEmpty
-                ? Center(
-                    child: Text(
-                      'No history yet',
-                      style: TextStyle(fontSize: 18, color: Colors.grey),
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: historyData.length,
-                    padding: EdgeInsets.all(10),
-                    itemBuilder: (context, index) {
-                      final dayData = historyData[index];
-                      final completedCount = dayData['completedCount'];
-                      final totalTasks = dayData['totalTasks'];
-                      final isFullyCompleted =
-                          completedCount == totalTasks && totalTasks == 3;
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // Determine responsive values
+            bool isMobile = constraints.maxWidth < 600;
+            bool isTablet =
+                constraints.maxWidth >= 600 && constraints.maxWidth < 1200;
+            bool isDesktop = constraints.maxWidth >= 1200;
 
-                      return Expanded(
-                        child: Card(
-                          margin: EdgeInsets.only(bottom: 10),
-                          elevation: 2,
-                          child: ExpansionTile(
-                            leading: CircleAvatar(
-                              backgroundColor: isFullyCompleted
-                                  ? Colors.green
-                                  : Colors.orange,
-                              child: Icon(
-                                isFullyCompleted ? Icons.check : Icons.pending,
-                                color: Colors.white,
+            double containerWidth;
+            if (isDesktop) {
+              containerWidth = constraints.maxWidth * 0.5;
+            } else if (isTablet) {
+              containerWidth = constraints.maxWidth * 0.7;
+            } else {
+              containerWidth = constraints.maxWidth * 0.95;
+            }
+
+            return Center(
+              child: Container(
+                width: containerWidth,
+                constraints: BoxConstraints(maxWidth: 900, minWidth: 300),
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 12 : 24,
+                  vertical: isMobile ? 16 : 24,
+                ),
+                child: historyData.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.history,
+                              size: isMobile ? 64 : 80,
+                              color: Colors.grey.withOpacity(0.5),
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              'No history yet',
+                              style: TextStyle(
+                                fontSize: isMobile ? 16 : 18,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
-                            title: Text(
-                              _formatDate(dayData['date']),
+                            SizedBox(height: 8),
+                            Text(
+                              'Complete tasks to see your history',
                               style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                                fontSize: isMobile ? 13 : 14,
+                                color: Colors.grey.withOpacity(0.7),
                               ),
                             ),
-                            subtitle: Text(
-                              '$completedCount/$totalTasks tasks completed',
-                              style: TextStyle(
-                                color: isFullyCompleted
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: historyData.length,
+                        padding: EdgeInsets.symmetric(
+                          vertical: isMobile ? 8 : 16,
+                        ),
+                        itemBuilder: (context, index) {
+                          final dayData = historyData[index];
+                          final completedCount = dayData['completedCount'];
+                          final totalTasks = dayData['totalTasks'];
+                          final isFullyCompleted =
+                              completedCount == totalTasks && totalTasks == 3;
+
+                          return Card(
+                            margin: EdgeInsets.only(
+                              bottom: isMobile ? 12 : 16,
+                              left: isMobile ? 0 : 8,
+                              right: isMobile ? 0 : 8,
+                            ),
+                            elevation: isMobile ? 1 : 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                isMobile ? 12 : 16,
+                              ),
+                            ),
+                            child: ExpansionTile(
+                              tilePadding: EdgeInsets.symmetric(
+                                horizontal: isMobile ? 12 : 20,
+                                vertical: isMobile ? 8 : 12,
+                              ),
+                              childrenPadding: EdgeInsets.symmetric(
+                                horizontal: isMobile ? 12 : 20,
+                                vertical: isMobile ? 12 : 16,
+                              ),
+                              leading: CircleAvatar(
+                                radius: isMobile ? 20 : 24,
+                                backgroundColor: isFullyCompleted
                                     ? Colors.green
-                                    : Colors.grey[600],
+                                    : Colors.orange,
+                                child: Icon(
+                                  isFullyCompleted
+                                      ? Icons.check
+                                      : Icons.pending,
+                                  color: Colors.white,
+                                  size: isMobile ? 20 : 24,
+                                ),
                               ),
-                            ),
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.all(15),
-                                child: Column(
+                              title: Text(
+                                _formatDate(dayData['date']),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: isMobile ? 15 : 17,
+                                ),
+                              ),
+                              subtitle: Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Text(
+                                  '$completedCount/$totalTasks tasks completed',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 13 : 14,
+                                    color: isFullyCompleted
+                                        ? Colors.green
+                                        : Colors.grey[600],
+                                  ),
+                                ),
+                              ),
+                              children: [
+                                Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     for (
@@ -168,8 +236,12 @@ class HistoryScreenState extends State<HistoryScreen> {
                                     )
                                       if (dayData['tasks'][i] != null)
                                         Padding(
-                                          padding: EdgeInsets.only(bottom: 8),
+                                          padding: EdgeInsets.only(
+                                            bottom: isMobile ? 10 : 12,
+                                          ),
                                           child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Icon(
                                                 (dayData['checkboxStates'][i]
@@ -182,13 +254,20 @@ class HistoryScreenState extends State<HistoryScreen> {
                                                         as bool)
                                                     ? Colors.green
                                                     : Colors.grey,
+                                                size: isMobile ? 20 : 24,
                                               ),
-                                              SizedBox(width: 10),
+                                              SizedBox(
+                                                width: isMobile ? 10 : 12,
+                                              ),
                                               Expanded(
                                                 child: Text(
-                                                  dayData['tasks'][i].toString(),
+                                                  dayData['tasks'][i]
+                                                      .toString(),
                                                   style: TextStyle(
-                                                    fontSize: 15,
+                                                    fontSize: isMobile
+                                                        ? 14
+                                                        : 15,
+                                                    height: 1.4,
                                                     decoration:
                                                         (dayData['checkboxStates'][i]
                                                             as bool)
@@ -199,8 +278,10 @@ class HistoryScreenState extends State<HistoryScreen> {
                                                         (dayData['checkboxStates'][i]
                                                             as bool)
                                                         ? Colors.grey
-                                                        : AppColors
-                                                              .pastelGreenColor,
+                                                        : Theme.of(context)
+                                                              .textTheme
+                                                              .bodyLarge
+                                                              ?.color,
                                                   ),
                                                 ),
                                               ),
@@ -209,14 +290,14 @@ class HistoryScreenState extends State<HistoryScreen> {
                                         ),
                                   ],
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-          ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            );
+          },
         ),
       ),
     );
