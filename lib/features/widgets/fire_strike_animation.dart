@@ -31,8 +31,8 @@ class LightningStrikeThroughPainter extends CustomPainter {
     canvas.drawLine(startPoint, endPoint, glowPaint);
 
     // Draw main line
-    canvas.drawLine(startPoint, endPoint, electricPaint);
 
+    canvas.drawLine(startPoint, endPoint, electricPaint);
     // Add spark at the end
     if (progress > 0.1) {
       final sparkPaint = Paint()

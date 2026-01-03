@@ -913,29 +913,51 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
                 // Show "Completed" message when all are checked
                 if (allCompleted && existingTasksCount == 3)
-                  Container(
-                    margin: EdgeInsets.only(top: 5, bottom: 13),
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColors.pastelGreenColor,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.warmOrangeColor,
-                          blurRadius: 4,
-                          offset: Offset(2, 2),
+                  Column(
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(top: 5, bottom: 13),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
                         ),
-                      ],
-                    ),
-                    child: Text(
-                      '✓ Completed',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
+                        decoration: BoxDecoration(
+                          color: AppColors.pastelGreenColor,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.warmOrangeColor,
+                              blurRadius: 4,
+                              offset: Offset(2, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          '✓ You\'re Incredible!',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                    ),
+                      HoverContainer(
+                        width: taskCardWidth,
+                        color: Colors.blueGrey,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.warmOrangeColor,
+                            blurRadius: 4,
+                            offset: Offset(2, 2),
+                          ),
+                        ],
+                        child: Center(
+                          child: Text('SEE YOU TOMORROW!', style: kRegular),
+                        ),
+                      ),
+                    ],
                   ),
+
                 // Confetti overlay
                 Align(
                   alignment: Alignment.topCenter,
@@ -979,6 +1001,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           ),
                         ),
                       ),
+                SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
